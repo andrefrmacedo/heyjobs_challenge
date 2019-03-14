@@ -1,22 +1,44 @@
 # frozen_string_literal: true
 
-class HeyjobsChallenge
-  def initialize(campaign); end
+require_relative 'heyjobs_challenge/external_api'
+require_relative 'heyjobs_challenge/discrepancy_detector'
 
-  def call
-    # call api pass
-    # check for descrepancies
-    # return response
+module HeyjobsChallenge
+  extend self
+
+  def call(local_state)
+    remote_state = ExternalApi.campaigns
+
+    if remote_state
+      find_discrepancies(local_state, remote_state)
+    else
+      error
+    end
+  end
+
+  private
+
+  def find_discrepancies(local, remote)
+    discrepancy_list = []
+
+    local.each do |local_ad|
+      remote_ad = remote.find { |ad| ad[:reference].to_i == local_ad[:external_reference].to_i }
+      ad_discrepancy = DiscrepancyDetector.call(local_ad, remote_ad) if remote_ad
+      discrepancy_list << parse(remote_ad[:reference], ad_discrepancy) if ad_discrepancy&.any?
+    end
+    discrepancy_list
+  end
+
+  def parse(reference, discrepancies)
+    {
+      remote_reference: reference,
+      discrepancies: discrepancies
+    }
+  end
+
+  def error
+    {
+      error: 'An unexpected error occurred'
+    }
   end
 end
-
-# assumptions
-# api url: https://mockbin.org/bin/fcb30500-7b98-476f-810d-463a0b8fc3df
-# Campaing is an object Model passed by argument
-# api url in .env file
-# this Service is part of an app, no need to create model, database, etc
-
-# Classes to create
-# API Wrapper with name: ExternalAPIWrapper
-# discrepancy checker with name: CheckDiscrepancy
-#
