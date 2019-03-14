@@ -1,15 +1,15 @@
+# frozen_string_literal: true
+
 require_relative 'external_api/api_wrapper'
 
 module ExternalApi
-  extend self
+  module_function
 
-  def get_campaigns
-    begin
-      response = ApiWrapper.new.get_campaigns
-      JSON.parse(response.body)
-    rescue => e
-      p e
-      false
-    end
+  def campaigns
+    response = ApiWrapper.new.campaigns
+    json = JSON.parse(response.body, symbolize_names: true)
+    json[:ads]
+  rescue StandardError
+    false
   end
 end
