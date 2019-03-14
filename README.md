@@ -3,7 +3,7 @@
 ## Assumptions
 For this challenge I made the follwing assumptions:
 - The external api url is `https://mockbin.org/bin/fcb30500-7b98-476f-810d-463a0b8fc3df`
-- The `Campaign` entity is passed as an hash argument of `HeijobsChallenge` service
+- The `Campaign` entities are passed as an array of hashes argument in the `HeyjobsChallenge` service
 - The `HeyjobsChallenge` service is supposed to run periodically
 
 
